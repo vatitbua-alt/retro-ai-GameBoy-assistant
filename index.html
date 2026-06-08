@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Retro AI Agent - เลขาส่วนตัวสุดน่ารัก</title>
+    
+    <!-- PWA Settings for Mobile and iPad -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Retro AI">
+    <meta name="theme-color" content="#9bbc0f">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="apple-touch-icon.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-gameboy">
+    <!-- CRT Effect Overlay -->
+    <div class="crt-overlay"></div>
+    <div class="scanlines"></div>
+
+    <div class="app-container">
+        <!-- Main Console Wrapper -->
+        <div class="console-body">
+            <!-- Console Header / Logo -->
+            <div class="console-header">
+                <div class="brand">
+                    <span class="brand-text-g">GAME</span>
+                    <span class="brand-text-b">BOY</span>
+                    <span class="brand-text-sub">AI AGENT</span>
+                </div>
+                <div class="battery-indicator">
+                    <div class="led-light active" id="battery-led"></div>
+                    <span class="led-label">BATTERY</span>
+                </div>
+            </div>
+
+            <!-- Screen Area -->
+            <div class="console-screen-border">
+                <div class="console-screen-inner">
+                    <!-- Virtual Room Canvas & Sprite Display -->
+                    <div class="screen-canvas-wrapper">
+                        <canvas id="game-canvas" width="320" height="180"></canvas>
+                        
+                        <!-- Dynamic Speech Bubble overlaying the canvas -->
+                        <div class="agent-speech-bubble" id="speech-bubble">
+                            <span class="bubble-arrow"></span>
+                            <div class="bubble-text" id="speech-text">สวัสดีค่ะเจ้านาย! ยินดีที่ได้พบกันนะคะ มีอะไรให้เฟียช่วยเตือนหรือบันทึกไหมคะ?</div>
+                        </div>
+                    </div>
+
+                    <!-- Status Display -->
+                    <div class="screen-status-bar">
+                        <div class="status-item">
+                            <span class="status-label">STATUS:</span>
+                            <span class="status-value pulse-text" id="agent-status">IDLE</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">TIME:</span>
+                            <span class="status-value" id="current-time">00:00:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- D-Pad and Action Buttons Area -->
+            <div class="console-controls">
+                <div class="dpad-container">
+                    <div class="dpad">
+                        <button class="dpad-btn up" id="btn-up" title="เดินขึ้น"></button>
+                        <button class="dpad-btn left" id="btn-left" title="เดินซ้าย"></button>
+                        <button class="dpad-btn right" id="btn-right" title="เดินขวา"></button>
+                        <button class="dpad-btn down" id="btn-down" title="เดินลง"></button>
+                        <div class="dpad-center"></div>
+                    </div>
+                    <span class="control-label">WALK</span>
+                </div>
+
+                <div class="brand-decorative-stripes">
+                    <div class="stripe"></div>
+                    <div class="stripe"></div>
+                    <div class="stripe"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <div class="btn-group">
+                        <button class="action-btn btn-a" id="btn-a">A</button>
+                        <span class="btn-label">INTERACT</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="action-btn btn-b" id="btn-b">B</button>
+                        <span class="btn-label">SOUND</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Navigation Buttons -->
+            <div class="console-menu-buttons">
+                <div class="menu-btn-group">
+                    <button class="menu-btn select-btn" id="btn-select"></button>
+                    <span class="menu-btn-label">THEME</span>
+                </div>
+                <div class="menu-btn-group">
+                    <button class="menu-btn start-btn" id="btn-start"></button>
+                    <span class="menu-btn-label">DANCE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- UI Interactive Panel (Control Panel & Chat) -->
+        <div class="ui-panel">
+            <!-- Navigation Tabs -->
+            <div class="panel-tabs">
+                <button class="tab-btn active" data-tab="chat">💬 แชทกับเลขา</button>
+                <button class="tab-btn" data-tab="reminders">⏰ การแจ้งเตือน</button>
+                <button class="tab-btn" data-tab="todo">📋 รายการงาน (ToDo)</button>
+            </div>
+
+            <!-- Tab: Chat AI Agent -->
+            <div class="tab-content active" id="tab-chat">
+                <div class="chat-history" id="chat-history">
+                    <div class="chat-bubble bot-message">
+                        <div class="sender-name">FIA (AI Agent)</div>
+                        <div class="message-text">สวัสดีค่ะ! ฉันคือเลขา AI ส่วนตัวของคุณค่ะ คุณสามารถคุยกับฉัน หรือพิมพ์คำสั่งเหล่านี้ได้เลยค่ะ:
+                            <ul class="cmd-list">
+                                <li><code>/remind [เรื่อง] ใน [x] นาที/วินาที</code> - ตั้งเตือน</li>
+                                <li><code>/todo [ชื่องาน]</code> - เพิ่มรายการงาน</li>
+                                <li><code>/sleep</code> - สั่งให้ไปนอน</li>
+                                <li><code>/dance</code> - สั่งให้เต้น</li>
+                                <li><code>/work</code> - สั่งให้ไปนั่งทำงานที่โต๊ะ</li>
+                            </ul>
+                        </div>
+                        <div class="message-time">ระบบ</div>
+                    </div>
+                </div>
+                <form class="chat-input-area" id="chat-form">
+                    <input type="text" id="chat-input" placeholder="พิมพ์ข้อความคุยกับเลขา หรือใช้คำสั่ง..." autocomplete="off">
+                    <button type="submit" class="retro-btn">ส่ง</button>
+                </form>
+            </div>
+
+            <!-- Tab: Reminders -->
+            <div class="tab-content" id="tab-reminders">
+                <div class="reminder-creator">
+                    <h3>⏰ ตั้งการแจ้งเตือนใหม่</h3>
+                    <form id="reminder-form" class="retro-form">
+                        <div class="form-group">
+                            <label for="reminder-text">แจ้งเตือนเรื่อง:</label>
+                            <input type="text" id="reminder-text" placeholder="เช่น ดื่มน้ำ, ยืดเส้นยืดสาย" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reminder-time">เวลา:</label>
+                                <input type="time" id="reminder-time" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reminder-quick">หรือนับถอยหลัง:</label>
+                                <select id="reminder-quick">
+                                    <option value="">-- ไม่นับถอยหลัง --</option>
+                                    <option value="10">10 วินาที (ทดสอบ)</option>
+                                    <option value="60">1 นาที</option>
+                                    <option value="300">5 นาที</option>
+                                    <option value="900">15 นาที</option>
+                                    <option value="1800">30 นาที</option>
+                                    <option value="3600">1 ชั่วโมง</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="retro-btn width-100">เพิ่มการแจ้งเตือน</button>
+                    </form>
+                </div>
+                <div class="reminders-list-container">
+                    <h3>🔔 รายการแจ้งเตือนที่กำลังจะถึง</h3>
+                    <ul class="retro-list" id="reminders-list">
+                        <!-- Reminders injected by JS -->
+                        <li class="empty-list-msg">ไม่มีการแจ้งเตือนที่ตั้งไว้</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tab: ToDo List -->
+            <div class="tab-content" id="tab-todo">
+                <div class="todo-creator">
+                    <h3>📋 เพิ่มรายการงานใหม่</h3>
+                    <form id="todo-form" class="retro-form-row">
+                        <input type="text" id="todo-text" placeholder="พิมพ์งานที่ต้องทำ เช่น เขียนรายงานสรุปยอดขาย..." required>
+                        <button type="submit" class="retro-btn">เพิ่ม</button>
+                    </form>
+                </div>
+                <div class="todo-list-container">
+                    <h3>📝 รายการงานทั้งหมด</h3>
+                    <ul class="retro-list" id="todo-list">
+                        <!-- ToDos injected by JS -->
+                        <li class="empty-list-msg">ไม่มีรายการงานค้างอยู่</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retro Alarm Modal popup -->
+    <div class="retro-modal-backdrop" id="alarm-modal">
+        <div class="retro-modal">
+            <div class="modal-header">
+                <h2>⚠️ ALERT / แจ้งเตือน!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="alert-icon-pixel">⏰</div>
+                <div class="alert-message" id="alarm-message">ได้เวลาทำบางอย่างแล้ว!</div>
+            </div>
+            <div class="modal-footer">
+                <button class="retro-btn" id="btn-close-alarm">รับทราบ (A)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker for PWA Add-to-Home-Screen support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered successfully with scope:', reg.scope))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

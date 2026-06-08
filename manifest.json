@@ -1,0 +1,23 @@
+{
+  "name": "Retro AI Agent - เลขาส่วนตัว",
+  "short_name": "Retro AI",
+  "description": "เลขา AI ส่วนตัวสุดน่ารักสไตล์ Retro Game Boy",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a221a",
+  "theme_color": "#9bbc0f",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
